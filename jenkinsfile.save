@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+    tools {
+        jdk 'jdk17' // must match the JDK name in Jenkins
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('Package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+    }
+}
+

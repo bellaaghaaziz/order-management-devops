@@ -1,0 +1,18 @@
+# Use Alpine as base
+FROM alpine
+
+# Install OpenJDK 17 and bash (for convenience)
+RUN apk add --no-cache openjdk17 bash
+
+# Set working directory
+WORKDIR /app
+
+# Copy the built JAR into the container
+COPY target/Order-1.0-SNAPSHOT.jar app.jar
+
+# Expose port (kept from original)
+EXPOSE 80
+
+# Run the JAR
+CMD ["java", "-jar", "app.jar"]
+

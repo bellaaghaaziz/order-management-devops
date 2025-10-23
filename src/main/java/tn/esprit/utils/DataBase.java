@@ -6,26 +6,24 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DataBase {
-    private static final String URL = "jdbc:mysql://localhost:3306/";
+    private static final String HOST_URL = "jdbc:mysql://order-mysql:3306/";
     private static final String DB_NAME = "orderdb";
-    private static final String USER = "root";       // ton utilisateur MySQL
-    private static final String PASSWORD = "";       // ton mot de passe MySQL
+    private static final String USER = "root";   // ton utilisateur MySQL
+    private static final String PASSWORD = "root123"; // ton mot de passe MySQL
 
     /**
      * Retourne une connexion à la base de données.
      * Crée la base si elle n'existe pas.
      */
     public static Connection getConnection() throws SQLException {
-        // Connexion au serveur MySQL
-        Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-
-        // Crée la base si elle n'existe pas
-        try (Statement stmt = conn.createStatement()) {
+        // Connexion au serveur MySQL (sans préciser la base)
+        try (Connection conn = DriverManager.getConnection(HOST_URL, USER, PASSWORD);
+             Statement stmt = conn.createStatement()) {
             stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + DB_NAME);
         }
 
         // Connexion à la base créée
-        return DriverManager.getConnection(URL + DB_NAME, USER, PASSWORD);
+        return DriverManager.getConnection(HOST_URL + DB_NAME, USER, PASSWORD);
     }
 
     /**
@@ -68,6 +66,8 @@ public class DataBase {
                     "    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE\n" +
                     ");\n";
             stmt.executeUpdate(orderSql);
+
+            // Table Order_Product
             String orderProductSql = "CREATE TABLE IF NOT EXISTS order_product (\n" +
                     "    order_id INT,\n" +
                     "    product_id INT,\n" +

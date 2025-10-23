@@ -1,25 +1,29 @@
 package tn.esprit;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tn.esprit.utils.DataBase;
 
-import static javafx.application.Application.launch;
+public class Main {
 
-public class Main extends Application {
-
-    public void start(Stage primaryStage) throws Exception {
-        DataBase.initTables();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/views/user.fxml"));
-        Scene scene = new Scene(loader.load(), 600, 400);
-        primaryStage.setTitle("Gestion Utilisateurs");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
+    private static final Logger logger = LogManager.getLogger(Main.class);
 
     public static void main(String[] args) {
-        launch(args); // ✅ Appel à la méthode launch() de Application
+        logger.info("Launching backend application...");
+
+        try {
+            logger.info("Initializing database tables...");
+            DataBase.initTables();
+            logger.info("Database tables initialized successfully.");
+
+            // Backend is ready, you can add more backend logic here
+            logger.info("Backend application started successfully.");
+            Thread.currentThread().join();
+
+        } catch (Exception e) {
+            logger.error("Failed to start the backend application", e);
+        }
     }
 }
+
+

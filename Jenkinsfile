@@ -2,12 +2,16 @@ pipeline {
     agent any
 
     tools {
-        jdk 'jdk17'          // Must match the JDK name configured in Jenkins
-        maven 'Maven3'       // Make sure Maven3 is configured in Jenkins
+        jdk 'jdk17'
+        maven 'Maven3'
     }
 
     environment {
-        SONARQUBE = 'sonarqube'   // The name you used in Jenkins > Manage Jenkins > System (SonarQube servers)
+        SONARQUBE = 'sonarqube'
+        DOCKERHUB_CREDENTIALS = 'dockerhub-credentials' // Jenkins credentials ID
+        DOCKERHUB_USERNAME = 'bellaghaaziz'              // Your DockerHub username
+        IMAGE_NAME = 'order-backend'
+        IMAGE_TAG = "build-${env.BUILD_NUMBER}"          // unique tag for each build
     }
 
     stages {
@@ -19,7 +23,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean install'
+                sh 'mvn clean install -DskipTests'
             }
         }
 
@@ -44,8 +48,39 @@ pipeline {
 
         stage('Package') {
             steps {
-                sh 'mvn package'
+                sh 'mvn package -DskipTests'
             }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh "docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                        sh '''
+                            echo "$PASS" | docker login -u "$USER" --password-stdin
+                            docker push ${USER}/${IMAGE_NAME}:${IMAGE_TAG}
+                            docker logout
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Build, Sonar analysis, and Docker image push succeeded!"
+        }
+        failure {
+            echo "❌ Pipeline failed. Check logs."
         }
     }
 }

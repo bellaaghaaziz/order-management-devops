@@ -11,7 +11,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS = 'dockerhub-credentials' // Jenkins credentials ID
         DOCKERHUB_USERNAME = 'bellaghaaziz'
         IMAGE_NAME = 'order-backend'
-        IMAGE_TAG = "build-\${env.BUILD_NUMBER}"
+        IMAGE_TAG = "build-${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -55,7 +55,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t \${DOCKERHUB_USERNAME}/\${IMAGE_NAME}:\${IMAGE_TAG} ."
+                    sh "docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} ."
                 }
             }
         }
@@ -63,7 +63,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: "\${DOCKERHUB_CREDENTIALS}", usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                         sh '''
                             echo "$PASS" | docker login -u "$USER" --password-stdin
                             docker push ${USER}/${IMAGE_NAME}:${IMAGE_TAG}
@@ -73,13 +73,14 @@ pipeline {
                 }
             }
         }
+    } 
 
     post {
         success {
-            echo "✅ Build, Sonar analysis, Docker push, and K8s deploy succeeded!"
+            echo " Build, Sonar analysis, Docker push, and K8s deploy succeeded!"
         }
         failure {
-            echo "❌ Pipeline failed. Check logs."
+            echo " Pipeline failed. Check logs."
         }
     }
-}
+} 

@@ -74,9 +74,6 @@ pipeline {
             }
         }
 
-        
-    }
-
     post {
         success {
             echo "✅ Build, Sonar analysis, Docker push, and K8s deploy succeeded!"

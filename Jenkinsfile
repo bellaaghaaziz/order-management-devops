@@ -74,20 +74,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    script {
-                        sh '''
-                          export IMAGE=${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}
-                          sed 's|REPLACE_IMAGE|'"$IMAGE"'|g' k8s/deployment.yaml > k8s/deployment-resolved.yaml
-                          kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/deployment-resolved.yaml
-                          kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/service.yaml
-                        '''
-                    }
-                }
-            }
-        }
+        
     }
 
     post {
